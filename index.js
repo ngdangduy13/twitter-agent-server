@@ -91,6 +91,7 @@ app.listen(port, async () => {
   console.log(`Example app listening on port ${port}`);
   const username = process.env.TWITTER_USERNAME;
   const password = process.env.TWITTER_PASSWORD;
+  console.log(`Username: ${username}, password: ${password}`);
   await scraper.login(username, password);
   console.log("Logged in to scraper");
 });
