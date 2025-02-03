@@ -92,6 +92,8 @@ app.listen(port, async () => {
   const username = process.env.TWITTER_USERNAME;
   const password = process.env.TWITTER_PASSWORD;
   const email = process.env.TWITTER_EMAIL;
+  await scraper.clearCookies();
+  console.log("Cleared cookies");
   console.log(`Username: ${username}, password: ${password}, email: ${email}`);
   await scraper.login(username, password, email);
   console.log("Logged in to scraper");
