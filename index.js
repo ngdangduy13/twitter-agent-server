@@ -133,14 +133,3 @@ app.listen(port, async () => {
   await scraper.login(username, password, email, twoFactorSecret);
   console.log("Logged in to scraper");
 });
-
-const crypto = require("crypto");
-
-// Generate a 16-byte random value for the client_id (hex-encoded)
-const clientId = crypto.randomBytes(16).toString("hex");
-
-// Generate a 32-byte random value for the client_secret (hex-encoded)
-const clientSecret = crypto.randomBytes(32).toString("hex");
-
-console.log(`CLIENT_ID: ${clientId}`);
-console.log(`CLIENT_SECRET: ${clientSecret}`);
