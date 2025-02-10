@@ -65,7 +65,39 @@ async function sendTweetWithRetry(message, replyToId) {
   );
 }
 
-app.post("/send-tweet", async (req, res) => {
+// Replace these with your own secrets and store them securely.
+// In production, never hard-code credentials.
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+
+// Basic Authentication middleware
+function basicAuth(req, res, next) {
+  // The Authorization header should look like "Basic base64encodedString"
+  const authHeader = req.headers.authorization;
+
+  // If there is no Authorization header or it doesn't start with "Basic", return 401
+  if (!authHeader || !authHeader.startsWith("Basic ")) {
+    // Prompt for credentials with the WWW-Authenticate header
+    res.setHeader("WWW-Authenticate", 'Basic realm="Secure Area"');
+    return res.status(401).send("Unauthorized");
+  }
+
+  // Extract base64 encoded credentials
+  const base64Credentials = authHeader.substring(6).trim();
+  const decoded = Buffer.from(base64Credentials, "base64").toString("utf8");
+  const [clientId, clientSecret] = decoded.split(":");
+
+  // Compare against your stored credentials
+  if (clientId === CLIENT_ID && clientSecret === CLIENT_SECRET) {
+    return next(); // Credentials are valid, move on
+  } else {
+    // Invalid credentials, prompt again
+    res.setHeader("WWW-Authenticate", 'Basic realm="Secure Area"');
+    return res.status(401).send("Unauthorized");
+  }
+}
+
+app.post("/send-tweet", basicAuth, async (req, res) => {
   try {
     const messages = req.body.messages;
     console.log(messages);
@@ -101,3 +133,14 @@ app.listen(port, async () => {
   await scraper.login(username, password, email, twoFactorSecret);
   console.log("Logged in to scraper");
 });
+
+const crypto = require("crypto");
+
+// Generate a 16-byte random value for the client_id (hex-encoded)
+const clientId = crypto.randomBytes(16).toString("hex");
+
+// Generate a 32-byte random value for the client_secret (hex-encoded)
+const clientSecret = crypto.randomBytes(32).toString("hex");
+
+console.log(`CLIENT_ID: ${clientId}`);
+console.log(`CLIENT_SECRET: ${clientSecret}`);
